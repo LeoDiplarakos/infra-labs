@@ -1,0 +1,36 @@
+name: CI
+
+on:
+  pull_request:
+    branches: [main]
+
+jobs:
+  terraform:
+    name: Terraform checks
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: azure-vm
+    steps:
+      - uses: actions/checkout@v4
+      - uses: hashicorp/setup-terraform@v3
+      - name: Format check
+        run: terraform fmt -check -recursive
+      - name: Init (no backend)
+        run: terraform init -backend=false
+      - name: Validate
+        run: terraform validate
+
+  shellcheck:
+    name: ShellCheck
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Lint shell scripts
+        run: |
+          mapfile -t files < <(git ls-files '*.sh')
+          if [ "${#files[@]}" -eq 0 ]; then
+            echo "No shell scripts yet."
+            exit 0
+          fi
+          shellcheck "${files[@]}"
