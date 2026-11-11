@@ -86,8 +86,8 @@ resource "azurerm_linux_virtual_machine" "example" {
 
   admin_ssh_key {
     username   = "azureuser"
-    public_key = file("~/.ssh/azure_lab.pub")
-   }
+    public_key = file(var.ssh_public_key_path)
+  }
 
   os_disk {
     caching              = "ReadWrite"
